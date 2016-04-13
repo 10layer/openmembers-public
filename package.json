@@ -1,0 +1,15 @@
+{
+  "name": "openmembers-public-api",
+  "version": "0.0.1",
+  "description": "A middleware API that serves what the public websites can show",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Jason Norwood-Young <jason@10layer.com>",
+  "license": "ISC",
+  "dependencies": {
+    "restify": "^4.0.4"
+  }
+}
