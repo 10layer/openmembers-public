@@ -10,6 +10,8 @@
   "author": "Jason Norwood-Young <jason@10layer.com>",
   "license": "ISC",
   "dependencies": {
-    "restify": "^4.0.4"
+    "async": "^2.0.0-rc.3",
+    "restify": "^4.0.4",
+    "restler-q": "^0.1.1"
   }
 }
