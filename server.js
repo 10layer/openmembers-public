@@ -141,7 +141,7 @@ var updateCache = function() {
 	getEvents();
 };
 
-setInterval(updateCache, config.timeout);
+setInterval(updateCache, config.timeout || 60000);
 
 updateCache();
 
