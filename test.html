@@ -9,7 +9,6 @@
 <body>
 	<div class="container">
 		<div id="people" class="row"></div>
-
 		<div id="events" class="row"></div>
 	</div>
 	
@@ -19,13 +18,13 @@
 <script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
 
 <script type="text/template" id="personCardTemplate">
-	<article class="teacher-classic-item filter-char-T panel panel-default col-sm-3">
-		<div class="inner k2t-element-hover panel-body">
-			<a href="http://w17.open.co.za/k-teacher/<%= id %>/" title="<%= name %>">
+	<article class="panel panel-default col-sm-3">
+		<div class="panel-body">
+			<a href="user.html#<%= id %>" title="<%= name %>">
 				<img width="200" src="https://my.open.co.za/image/resize/<%= encodeURIComponent(img) %>/200/200" class="img-circle attachment-thumb_500x500 size-thumb_500x500 wp-post-image" alt="<%= name %>">
 			</a>
 			<h4 class="title">
-				<a href="http://w17.open.co.za/k-teacher/<%= id %>/" title="Trenton Devine"><%= name %></a>
+				<a href="user.html#<%= id %>"><%= name %></a>
 			</h4>
 			<span class="position"><%= position %></span>
 			<p class="excerpt"><%= about %></p>

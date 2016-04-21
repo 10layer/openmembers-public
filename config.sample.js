@@ -3,6 +3,7 @@ var config = {
 	username: "me@blah.com",
 	password: "password",
 	port: 3006,
+	timeout: 600000,
 	mysql: {
 		connectionLimit : 100, //important
 		host     : 'localhost',
