@@ -107,6 +107,7 @@ var getUsers = function() {
 	console.time("getUsers");
 	get("user", { 
 		"filter[status]": "active",
+		autopopulate: true
 	})
 	.then(function(result) {
 		users = result.data.filter(function(user) {
