@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Test</title>
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	
+	<div id="people"></div>
+</body>
+
+<script src="http://underscorejs.org/underscore-min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
+
+<script type="text/template" id="personCardTemplate">
+	<article class="teacher-classic-item filter-char-T">
+		<div class="inner k2t-element-hover">
+			<a href="http://w17.open.co.za/k-teacher/<%= id %>/" title="<%= name %>"><img width="450" src="https://my.open.co.za/<%= img %>" class="attachment-thumb_500x500 size-thumb_500x500 wp-post-image" alt="<%= name %>"></a>
+			<h4 class="title">
+				<a href="http://w17.open.co.za/k-teacher/<%= id %>/" title="Trenton Devine"><%= name %></a>
+			</h4>
+			<span class="position"><%= position %></span>
+			<p class="excerpt"><%= about %></p>
+		</div>
+	</article>
+</script>
+
+<script>
+	(function() {
+		var personCardTemplate = _.template($("#personCardTemplate").html());
+		$.get("http://localhost:3006/user/random/4")
+		.then(function(result) {
+			for(var x = 0; x < result.data.length; x++) {
+				var person = result.data[x];
+				$("#people").append(personCardTemplate(person));
+			}
+		});
+	})();
+</script>
+</html>
