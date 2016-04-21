@@ -58,7 +58,7 @@
 <script>
 	(function() {
 		var personCardTemplate = _.template($("#personCardTemplate").html());
-		$.get("http://localhost:3006/user/random/4")
+		$.get("http://my.open.co.za:3006/user/random/4")
 		.then(function(result) {
 			for(var x = 0; x < result.data.length; x++) {
 				var person = result.data[x];
@@ -67,7 +67,7 @@
 		});
 
 		var eventCardTemplate = _.template($("#eventCardTemplate").html());
-		$.get("http://localhost:3006/event")
+		$.get("http://my.open.co.za:3006/event")
 		.then(function(result) {
 			console.log(result);
 			for(var x = 0; x < result.data.length; x++) {
