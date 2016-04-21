@@ -64,149 +64,8 @@ var mapIds = function(objs) {
 	return result;
 };
 
-function serialize (mixed_value) {
-  //  discuss at: http://phpjs.org/functions/serialize/
-  // original by: Arpad Ray (mailto:arpad@php.net)
-  // improved by: Dino
-  // improved by: Le Torbi (http://www.letorbi.de/)
-  // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net/)
-  // bugfixed by: Andrej Pavlovic
-  // bugfixed by: Garagoth
-  // bugfixed by: Russell Walker (http://www.nbill.co.uk/)
-  // bugfixed by: Jamie Beck (http://www.terabit.ca/)
-  // bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net/)
-  // bugfixed by: Ben (http://benblume.co.uk/)
-  // bugfixed by: Codestar (http://codestarlive.com/)
-  //    input by: DtTvB (http://dt.in.th/2008-09-16.string-length-in-bytes.html)
-  //    input by: Martin (http://www.erlenwiese.de/)
-  //        note: We feel the main purpose of this function should be to ease the transport of data between php & js
-  //        note: Aiming for PHP-compatibility, we have to translate objects to arrays
-  //   example 1: serialize(['Kevin', 'van', 'Zonneveld']);
-  //   returns 1: 'a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}'
-  //   example 2: serialize({firstName: 'Kevin', midName: 'van', surName: 'Zonneveld'});
-  //   returns 2: 'a:3:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";s:7:"surName";s:9:"Zonneveld";}'
-
-  var val, key, okey,
-    ktype = '',
-    vals = '',
-    count = 0,
-    _utf8Size = function (str) {
-      var size = 0,
-        i = 0,
-        l = str.length,
-        code = '';
-      for (i = 0; i < l; i++) {
-        code = str.charCodeAt(i);
-        if (code < 0x0080) {
-          size += 1;
-        } else if (code < 0x0800) {
-          size += 2;
-        } else {
-          size += 3;
-        }
-      }
-      return size;
-    },
-    _getType = function (inp) {
-      var match, key, cons, types, type = typeof inp;
-
-      if (type === 'object' && !inp) {
-        return 'null';
-      }
-
-      if (type === 'object') {
-        if (!inp.constructor) {
-          return 'object';
-        }
-        cons = inp.constructor.toString();
-        match = cons.match(/(\w+)\(/);
-        if (match) {
-          cons = match[1].toLowerCase();
-        }
-        types = ['boolean', 'number', 'string', 'array'];
-        for (key in types) {
-          if (cons === types[key]) {
-            type = types[key];
-            break;
-          }
-        }
-      }
-      return type;
-    },
-    type = _getType(mixed_value);
-
-  switch (type) {
-    case 'function':
-      val = '';
-      break;
-    case 'boolean':
-      val = 'b:' + (mixed_value ? '1' : '0');
-      break;
-    case 'number':
-      val = (Math.round(mixed_value) === mixed_value ? 'i' : 'd') + ':' + mixed_value;
-      break;
-    case 'string':
-      val = 's:' + _utf8Size(mixed_value) + ':"' + mixed_value + '"';
-      break;
-    case 'array':
-    case 'object':
-      val = 'a';
-    /*
-        if (type === 'object') {
-          var objname = mixed_value.constructor.toString().match(/(\w+)\(\)/);
-          if (objname == undefined) {
-            return;
-          }
-          objname[1] = this.serialize(objname[1]);
-          val = 'O' + objname[1].substring(1, objname[1].length - 1);
-        }
-        */
-
-      for (key in mixed_value) {
-        if (mixed_value.hasOwnProperty(key)) {
-          ktype = _getType(mixed_value[key]);
-          if (ktype === 'function') {
-            continue;
-          }
-
-          okey = (key.match(/^[0-9]+$/) ? parseInt(key, 10) : key);
-          vals += serialize(okey) + serialize(mixed_value[key]);
-          count++;
-        }
-      }
-      val += ':' + count + ':{' + vals + '}';
-      break;
-    // case 'undefined':
-    // Fall-through
-    default:
-    // if the JS object has a property which contains a null value, the string cannot be unserialized by PHP
-      val = 'N';
-      break;
-  }
-  if (type !== 'object' && type !== 'array') {
-    val += ';';
-  }
-  return val;
-}
-
 server.get("/user/random/:count", function(req, res) {
-	var getUser = function(offset, callback) {
-		console.log("Fetching offset", offset);
-		get("user", { 
-			"filter[status]": "active",
-			"filter[about]": "$ne:null",
-			"autopopulate": 1,
-			limit: 1,
-			page: offset
-		})
-		.then(function(result) {
-			var user = result.data.pop();
-			callback(null, user);
-		}, function(err) {
-			console.error(err);
-			callback(err);
-		});
-	};
+	
 	var count = req.params.count;
 	if (count > 10)
 		count = 10;
@@ -214,14 +73,29 @@ server.get("/user/random/:count", function(req, res) {
 	get("user", { 
 		"filter[status]": "active",
 		// "autopopulate": 1,
-		limit: 1
+		// limit: 10,
 	})
 	.then(function(result) {
-		console.log(result);
-		var max = result.count;
+		var queue = [];
+		var users = result.data.filter(function(user) {
+			if (!user.about)
+				return false;
+			if (!user.about.length)
+				return false;
+			if (!user.about[0].trim())
+				return false;
+			if (!user.img)
+				return false;
+			if (user.img.indexOf("grey_avatar_1.png") !== -1)
+				return false;
+			if (!user.urlid)
+				return false;
+			return true;
+		});
+		var max = users.length;
 		if (count > max)
 			count = max;
-		var queue = [];
+		
 		// console.log(req.params.count);
 		var tmp = [];
 		while(tmp.length < count) {
@@ -230,29 +104,27 @@ server.get("/user/random/:count", function(req, res) {
 				tmp.push(rand);
 			}
 		}
-		async.mapSeries(tmp, getUser, function(err, users) {
-			if (err) {
-				console.error(err);
-				res.send(500, err);
-				return;
-			}
-			console.log(users);
-			var data = users.map(function(user) {
-				return {
-					name: user.name,
-					organisation: user.organisation_id.name,
-					website: user.organisation_id.website,
-					location: user.location_id.name,
-					about: user.about,
-					img: user.img,
-					twitter: user.organisation_id.twitter,
-					id: user.urlid,
-					position: user.position,
-				};
-			});
-			console.timeEnd("user/random/" + count);
-			res.send({ status: "ok", count: data.length, data: data });
+		var finalUsers = [];
+		tmp.forEach(function(id) {
+			finalUsers.push(users[id]);
 		});
+
+		var data = finalUsers.map(function(user) {
+			return {
+				name: user.name,
+				organisation: user.organisation_id.name,
+				website: user.organisation_id.website,
+				location: user.location_id.name,
+				about: user.about,
+				img: user.img,
+				twitter: user.organisation_id.twitter,
+				id: user.urlid,
+				position: user.position,
+			};
+		});
+		console.timeEnd("user/random/" + count);
+		res.send({ status: "ok", count: data.length, data: data });
+		
 	}, function(err) {
 		console.timeEnd("user/random/" + count);
 		console.error(err);
@@ -278,14 +150,19 @@ server.get("/event", function(req, res) {
 				"room_name": event.room.name,
 				"room_img": event.room.img,
 				"location": locations[event.room.location].name,
-				"start_time": true,
-				"end_time": true,
+				"start_time": event.start_time,
+				"end_time": event.end_time,
 				"title": event.title,
 				"description": event.description,
+				booking_url: event.booking_url,
+				website: event.website,
+				address: event.room.name + "<br>\r\n" + locations[event.room.location].name + "<br>\r\n" + locations[event.room.location].address,
+				id: event._id,
+				img: event.img,
 			};
 		});
 		console.timeEnd("event");
-		res.send(data);
+		res.send({ status: "ok", count: data.length, data: data });
 	}, function(err) {
 		console.error(err);
 		console.timeEnd("event");
