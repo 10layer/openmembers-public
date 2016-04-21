@@ -2,7 +2,6 @@ var restify = require("restify");
 var restler = require("restler-q");
 var config = require("./config");
 var async = require("async");
-var mysql = require('mysql');
 var Q = require("q");
 
 var server = restify.createServer();
