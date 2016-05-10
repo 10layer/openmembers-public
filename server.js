@@ -68,7 +68,7 @@ var getEvents = function() {
 	console.time("getEvents");
 	console.log("getEvents");
 	var date = new Date();
-	var today = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+	var today = date.getTime();
 	get("location")
 	.then(function(result) {
 		locations = mapIds(result.data);
