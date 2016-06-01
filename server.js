@@ -99,6 +99,7 @@ var userMap = function(user) {
 		twitter: user.organisation_id.twitter,
 		id: user.urlid,
 		position: user.position,
+		_id: user._id,
 	};
 };
 
