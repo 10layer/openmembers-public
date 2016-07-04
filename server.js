@@ -49,8 +49,11 @@ configParams = function(opts) {
 	return parts.join("&");
 };
 
-var get = function(endpoint, params) {
-	return restler.get(config.api + "/" + endpoint + "?" + configParams(params), options);
+var get = function(endpoint, params, opts) {
+	opts = opts || options;
+	console.log(opts);
+	console.log(config.api + "/" + endpoint + "?" + configParams(params));
+	return restler.get(config.api + "/" + endpoint + "?" + configParams(params), opts);
 };
 
 var mapIds = function(objs) {
@@ -66,14 +69,13 @@ var events = null;
 
 var getEvents = function() {
 	console.time("getEvents");
-	console.log("getEvents");
 	var date = new Date();
 	var today = date.getTime();
 	get("location")
 	.then(function(result) {
 		locations = mapIds(result.data);
 		return get("booking", {
-			"filter[start_time]": "$gte:" + today,
+			"filter[end_time]": "$gte:" + today,
 			"filter[public_event]": true,
 			"autopopulate": true 
 		});
@@ -185,6 +187,7 @@ server.get("/user/:urlid", function(req, res) {
 
 var eventMap = function(event) {
 	// console.log(event);
+	var ts = new Date(event.start_time);
 	return {
 		"room_name": event.room.name,
 		"room_img": event.room.img,
@@ -198,12 +201,15 @@ var eventMap = function(event) {
 		address: event.room.name + "<br>\r\n" + locations[event.room.location].name + "<br>\r\n" + locations[event.room.location].address,
 		id: event._id,
 		img: event.img,
+		start_time_time: ts.getHours() + ":" + ts.getMinutes()
 	};
 };
 
 server.get("/event", function(req, res) {
 	console.time("event");
+	console.log(events);
 	res.send({ status: "ok", count: events.length, data: events });
+	console.timeEnd("event");
 });
 
 server.get("/event/:event_id", function(req, res) {
@@ -218,7 +224,69 @@ server.get("/event/:event_id", function(req, res) {
 	}
 	res.send(event);
 	console.timeEnd("booking/" + req.params.event_id);
-	
+});
+
+//Tenth free coffee
+
+server.use(restify.authorizationParser());
+
+server.get("/coffee", function(req, res) {
+	var coffeeNames = [
+		"Flat White", "Americano", "Cappuccino", "Late", "COFFEE & PASTRY"
+	];
+	var teaNames = [
+		"Ceylon Tea", "Rooibos Tea"
+	];
+	var juiceNames = [ 
+		"Vitamin G"
+	];
+	var auth = req.authorization;
+	get("user", {
+		"filter[email]": auth.basic.username
+	}, { username: auth.basic.username, password: auth.basic.password })
+	.then(function(result) {
+		console.log(result);
+		var user_id = result.data.pop()._id;
+		return get("ledger", {
+			"filter[user_id]": user_id,
+			"filter[cred_type]": "stuff",
+			"filter[transaction_type]": "debit"
+		}, { username: auth.basic.username, password: auth.basic.password });
+	})
+	.then(function(result) {
+		var transactions = result.data.filter((transaction) => {
+			return !!(transaction.details);
+		});
+		var purchased = transactions.map((transaction) => {
+			try {
+				return JSON.parse(transaction.details);
+			} catch(e) {
+				return [];
+			}
+		});
+		var coffees = 0;
+		var juices = 0;
+		var teas = 0;
+		purchased.forEach((purchases) =>{
+			purchases.forEach(purchase => {
+				if (coffeeNames.indexOf(purchase.name) > -1) {
+					coffees += parseInt(purchase.qty);
+					console.log("Coffee", purchase.qty, parseInt(purchase.qty));
+				}
+				if (teaNames.indexOf(purchase.name) > -1) {
+					teas += parseInt(purchase.qty);
+					console.log("Tea", purchase.qty, parseInt(purchase.qty));
+				}
+				if (juiceNames.indexOf(purchase.name) > -1) {
+					juices += parseInt(purchase.qty);
+					console.log("Juice", purchase.qty, parseInt(purchase.qty));
+				}
+			});
+		});
+		res.send({ coffees: coffees, teas: teas, juices: juices })
+	}, function(err) {
+		res.send(err);
+	});
 });
 
 server.listen(config.port, function() {
