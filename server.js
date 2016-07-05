@@ -232,13 +232,10 @@ server.use(restify.authorizationParser());
 
 server.get("/coffee", function(req, res) {
 	var coffeeNames = [
-		"Flat White", "Americano", "Cappuccino", "Late", "COFFEE & PASTRY"
-	];
-	var teaNames = [
-		"Ceylon Tea", "Rooibos Tea"
+		"Flat White", "Americano", "Cappucino", "Cafe Latte", "Chai Latte", "Almond/ Soy Cappucino", "Mocha", "Decaf ", "Dbl Espresso", "Hot Chocolate", "Ceylon Tea", "Rooibos Tea", "Green Tea", "Earl Grey Blue"
 	];
 	var juiceNames = [ 
-		"Vitamin G"
+		"Vitamin G", "The Goblin", "Up the Beet ", "Citrus Zinger"
 	];
 	var auth = req.authorization;
 	get("user", {
@@ -266,16 +263,11 @@ server.get("/coffee", function(req, res) {
 		});
 		var coffees = 0;
 		var juices = 0;
-		var teas = 0;
 		purchased.forEach((purchases) =>{
 			purchases.forEach(purchase => {
 				if (coffeeNames.indexOf(purchase.name) > -1) {
 					coffees += parseInt(purchase.qty);
 					console.log("Coffee", purchase.qty, parseInt(purchase.qty));
-				}
-				if (teaNames.indexOf(purchase.name) > -1) {
-					teas += parseInt(purchase.qty);
-					console.log("Tea", purchase.qty, parseInt(purchase.qty));
 				}
 				if (juiceNames.indexOf(purchase.name) > -1) {
 					juices += parseInt(purchase.qty);
@@ -283,7 +275,7 @@ server.get("/coffee", function(req, res) {
 				}
 			});
 		});
-		res.send({ coffees: coffees, teas: teas, juices: juices })
+		res.send({ coffees: coffees, juices: juices })
 	}, function(err) {
 		res.send(err);
 	});
