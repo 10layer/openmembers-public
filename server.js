@@ -238,12 +238,15 @@ server.get("/coffee", function(req, res) {
 		"Vitamin G", "The Goblin", "Up the Beet ", "Citrus Zinger"
 	];
 	var auth = req.authorization;
+	var name = "";
 	get("user", {
 		"filter[email]": auth.basic.username
 	}, { username: auth.basic.username, password: auth.basic.password })
 	.then(function(result) {
-		console.log(result);
-		var user_id = result.data.pop()._id;
+		// console.log(result);
+		var user = result.data.pop();
+		var user_id = user._id;
+		name = user.name;
 		return get("ledger", {
 			"filter[user_id]": user_id,
 			"filter[cred_type]": "stuff",
@@ -275,7 +278,7 @@ server.get("/coffee", function(req, res) {
 				}
 			});
 		});
-		res.send({ coffees: coffees, juices: juices })
+		res.send({ name: name, coffees: coffees, juices: juices })
 	}, function(err) {
 		res.send(err);
 	});
