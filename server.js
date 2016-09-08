@@ -196,6 +196,7 @@ var eventMap = function(event) {
 		"end_time": event.end_time,
 		"title": event.title,
 		"description": event.description,
+		location_id: event.room.location,
 		booking_url: event.booking_url,
 		website: event.website,
 		address: event.room.name + "<br>\r\n" + locations[event.room.location].name + "<br>\r\n" + locations[event.room.location].address,
@@ -210,6 +211,15 @@ server.get("/event", function(req, res) {
 	console.log(events);
 	res.send({ status: "ok", count: events.length, data: events });
 	console.timeEnd("event");
+});
+
+server.get("/events/:location_id", (req, res) => {
+	console.time("events" );
+	var data = events.filter((event) => {
+		return (event.location_id == req.params.location_id);
+	});
+	res.send({ status: "ok", count: data.length, data: data });
+	console.timeEnd("events");
 });
 
 server.get("/event/:event_id", function(req, res) {
@@ -278,7 +288,7 @@ server.get("/coffee", function(req, res) {
 				}
 			});
 		});
-		res.send({ name: name, coffees: coffees, juices: juices })
+		res.send({ name: name, coffees: coffees, juices: juices });
 	}, function(err) {
 		res.send(err);
 	});
