@@ -118,6 +118,8 @@ var getUsers = function() {
 				return false;
 			if (!user.about.length)
 				return false;
+			if (user.hidden)
+				return false;
 			// if (!user.about.trim())
 			// 	return false;
 			if (!user.img)
@@ -134,8 +136,8 @@ var getUsers = function() {
 		console.log("Retrieved " + users.length + " users");
 		console.timeEnd("getUsers");
 	})
-	.then(null, function(err) {
-		console.error(err);
+	.catch(function(err) {
+		console.trace(err);
 	});
 };
 
