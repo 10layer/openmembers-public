@@ -70,7 +70,7 @@ var events = null;
 var getEvents = function() {
 	console.time("getEvents");
 	var date = new Date();
-	var today = date.getTime();
+	var today = date.toISOString();
 	get("location")
 	.then(function(result) {
 		locations = mapIds(result.data);
