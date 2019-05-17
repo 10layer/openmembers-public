@@ -10,10 +10,7 @@
   "author": "Jason Norwood-Young <jason@10layer.com>",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.0.0-rc.3",
     "imagesize": "^1.0.0",
-    "node-mysql": "^0.4.2",
-    "q": "^1.4.1",
     "restify": "^4.0.4",
     "restler-q": "^0.1.1",
     "ssh2": "^0.5.0"

@@ -1,8 +1,6 @@
 var restify = require("restify");
 var restler = require("restler-q");
 var config = require("./config");
-var async = require("async");
-var Q = require("q");
 
 var server = restify.createServer();
 var options = {
@@ -17,27 +15,6 @@ server.use(
 		return next();
 	}
 );
-
-var query = function(sql) {
-	var deferred = Q.defer();
-	pool.getConnection(function(err, connection) {
-		if (err) {
-			connection.release();
-			deferred.reject(err);
-			return;
-		}
-		// console.log('connected as id ' + connection.threadId);
-		connection.query(sql, function(err,rows) {
-			connection.release();
-			if(err) {
-				deferred.reject(err);
-				return;
-			}
-			deferred.resolve(rows);
-		});
-	});
-	return deferred.promise;
-};
 
 configParams = function(opts) {
 	opts = opts || {};
